@@ -2,362 +2,221 @@
 <html lang="id">
 <link rel="manifest" href="/manifest.json">
 <script>
-   if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
-    }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 </script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Absensi Digital</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Absensi Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0f14; --surface: #161a24; --card: #1e2334; --border: #2a3048;
+    --accent: #4ade80; --accent2: #38bdf8; --accent3: #f59e0b;
+    --danger: #f87171; --text: #e8ecf4; --muted: #6b7492; --radius: 12px;
+  }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    :root {
-      --bg: #0d0f14;
-      --surface: #161a24;
-      --card: #1e2334;
-      --border: #2a3048;
-      --accent: #4ade80;
-      --accent2: #38bdf8;
-      --accent3: #f59e0b;
-      --danger: #f87171;
-      --text: #e8ecf4;
-      --muted: #6b7492;
-      --radius: 12px;
-    }
+  /* HEADER */
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;
+    height: 64px; position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+  .logo-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 12px var(--accent); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.5; transform:scale(1.4); } }
+  .header-clock { font-family: 'DM Mono', monospace; font-size: 1.4rem; font-weight: 500; color: var(--accent2); letter-spacing: 0.05em; }
+  .header-date { font-size: 0.75rem; color: var(--muted); text-align: right; line-height: 1.3; }
 
-    body {
-      font-family: 'Sora', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+  /* LAYOUT */
+  .container {
+    max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem;
+    display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start;
+  }
+  .left-panel { display: flex; flex-direction: column; gap: 1rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+  .section-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
 
-    /* ---- HEADER ---- */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-      position: sticky; top: 0; z-index: 100;
-    }
-    .logo {
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .logo-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%,100%{ opacity:1; transform:scale(1); }
-      50%{ opacity:0.5; transform:scale(1.4); }
-    }
-    .header-clock {
-      font-family: 'DM Mono', monospace;
-      font-size: 1.4rem;
-      font-weight: 500;
-      color: var(--accent2);
-      letter-spacing: 0.05em;
-    }
-    .header-date {
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-align: right;
-      line-height: 1.3;
-    }
+  .input-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+  .input-group label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+  .input-group input {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 0.65rem 0.9rem; border-radius: 8px; font-size: 0.9rem;
+    font-family: 'Sora', sans-serif; outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .input-group input:focus { border-color: var(--accent2); }
 
-    /* ---- LAYOUT ---- */
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 1.5rem;
-      align-items: start;
-    }
+  /* CAMERA PREVIEW */
+  .camera-box {
+    position: relative; width: 100%; aspect-ratio: 4/3;
+    background: #000; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); display: none; margin-bottom: 1rem;
+  }
+  .camera-box.active { display: block; }
+  #videoEl { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .camera-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 10px 12px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cam-timestamp {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    letter-spacing: 0.05em; line-height: 1.4;
+  }
+  .cam-indicator { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: #fff; }
+  .cam-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--danger); animation: pulse 1s infinite; }
 
-    /* ---- LEFT PANEL ---- */
-    .left-panel { display: flex; flex-direction: column; gap: 1rem; }
+  /* BUTTONS */
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 0.75rem 1.2rem; border-radius: 9px; border: none;
+    font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; width: 100%;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-masuk { background: var(--accent); color: #0a1a0a; }
+  .btn-masuk:hover { filter: brightness(1.1); }
+  .btn-keluar { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+  .btn-keluar:hover { background: rgba(248,113,113,0.08); }
+  .btn-capture { background: #fff; color: #000; border: none; }
+  .btn-capture:hover { filter: brightness(0.9); }
+  .btn-cancel-cam { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-cancel-cam:hover { border-color: var(--danger); color: var(--danger); }
+  .btn-row { display: flex; gap: 0.6rem; }
+  .btn-row .btn { width: auto; flex:1; }
+  .btn-sm {
+    padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 6px;
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; font-family: 'Sora', sans-serif; transition: all 0.15s;
+  }
+  .btn-sm:hover { border-color: var(--accent2); color: var(--accent2); }
+  .btn-danger-sm { border-color: var(--danger); color: var(--danger); }
+  .btn-danger-sm:hover { background: rgba(248,113,113,0.1); }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-    }
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1rem; }
+  .stat-value { font-size: 1.6rem; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 0.7rem; color: var(--muted); }
+  .s-masuk .stat-value { color: var(--accent); }
+  .s-pulang .stat-value { color: var(--accent2); }
+  .s-belum .stat-value { color: var(--accent3); }
+  .s-total .stat-value { color: var(--text); }
 
-    .section-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 1rem;
-    }
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem; background: var(--card);
+    border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1.2rem;
+    font-size: 0.85rem; max-width: 300px; transform: translateY(120%); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index: 999;
+    display: flex; align-items: center; gap: 10px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-color: var(--accent); }
+  #toast.error { border-color: var(--danger); }
 
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .input-group label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-    .input-group input {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.65rem 0.9rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-family: 'Sora', sans-serif;
-      outline: none;
-      transition: border-color 0.2s;
-      width: 100%;
-    }
-    .input-group input:focus {
-      border-color: var(--accent2);
-    }
+  /* TABLE */
+  .right-panel { display: flex; flex-direction: column; gap: 1rem; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; }
+  .table-title { font-size: 1rem; font-weight: 600; }
+  .search-box {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 0.5rem 0.9rem; font-size: 0.85rem;
+    font-family: 'Sora', sans-serif; outline: none; width: 200px; transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--accent2); }
+  .search-box::placeholder { color: var(--muted); }
 
-    /* ---- BUTTONS ---- */
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 0.75rem 1.2rem;
-      border-radius: 9px;
-      border: none;
-      font-family: 'Sora', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      width: 100%;
-    }
-    .btn:active { transform: scale(0.97); }
-    .btn-masuk {
-      background: var(--accent);
-      color: #0a1a0a;
-    }
-    .btn-masuk:hover { filter: brightness(1.1); }
-    .btn-keluar {
-      background: transparent;
-      border: 1px solid var(--danger);
-      color: var(--danger);
-    }
-    .btn-keluar:hover { background: rgba(248,113,113,0.08); }
-    .btn-row { display: flex; gap: 0.6rem; }
-    .btn-row .btn { width: auto; flex:1; }
-    .btn-sm {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.75rem;
-      border-radius: 6px;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      cursor: pointer;
-      font-family: 'Sora', sans-serif;
-      transition: all 0.15s;
-    }
-    .btn-sm:hover { border-color: var(--accent2); color: var(--accent2); }
-    .btn-danger-sm {
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-    .btn-danger-sm:hover { background: rgba(248,113,113,0.1); }
+  .table-wrapper { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  thead th {
+    background: var(--surface); color: var(--muted); font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 0.9rem 1.2rem;
+    text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody td { padding: 0.85rem 1.2rem; vertical-align: middle; }
+  .td-name { font-weight: 500; }
+  .td-id { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  .td-time { font-family: 'DM Mono', monospace; color: var(--accent2); font-size: 0.82rem; }
+  .td-actions { display: flex; gap: 6px; align-items: center; }
 
-    /* ---- STATS GRID ---- */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.6rem;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.9rem 1rem;
-    }
-    .stat-value {
-      font-size: 1.6rem;
-      font-weight: 700;
-      font-family: 'DM Mono', monospace;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .stat-label { font-size: 0.7rem; color: var(--muted); }
-    .s-masuk .stat-value { color: var(--accent); }
-    .s-pulang .stat-value { color: var(--accent2); }
-    .s-belum .stat-value { color: var(--accent3); }
-    .s-total .stat-value { color: var(--text); }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #0a1a0a; flex-shrink: 0;
+  }
+  .td-user { display: flex; align-items: center; gap: 10px; }
 
-    /* ---- TOAST ---- */
-    #toast {
-      position: fixed; bottom: 2rem; right: 2rem;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.9rem 1.2rem;
-      font-size: 0.85rem;
-      max-width: 300px;
-      transform: translateY(120%);
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.success { border-color: var(--accent); }
-    #toast.error { border-color: var(--danger); }
+  /* PHOTO THUMBNAIL */
+  .photo-thumb {
+    width: 44px; height: 44px; border-radius: 8px; object-fit: cover;
+    border: 1px solid var(--border); cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .photo-thumb:hover { transform: scale(1.08); border-color: var(--accent2); }
+  .no-photo {
+    width: 44px; height: 44px; border-radius: 8px;
+    border: 1px dashed var(--border); display: flex; align-items: center;
+    justify-content: center; color: var(--muted); font-size: 1rem;
+  }
 
-    /* ---- RIGHT: TABLE ---- */
-    .right-panel { display: flex; flex-direction: column; gap: 1rem; }
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 3rem; color: var(--muted); font-size: 0.9rem; }
+  .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; }
 
-    .table-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-    }
-    .table-title { font-size: 1rem; font-weight: 600; }
-    .search-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: 0.5rem 0.9rem;
-      font-size: 0.85rem;
-      font-family: 'Sora', sans-serif;
-      outline: none;
-      width: 200px;
-      transition: border-color 0.2s;
-    }
-    .search-box:focus { border-color: var(--accent2); }
-    .search-box::placeholder { color: var(--muted); }
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    z-index: 200; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 2rem; width: 380px; max-width: 90vw;
+    transform: scale(0.95); transition: transform 0.2s;
+  }
+  .modal-overlay.show .modal { transform: scale(1); }
+  .modal h3 { font-size: 1rem; margin-bottom: 1rem; }
+  .modal-actions { display: flex; gap: 0.6rem; margin-top: 1.2rem; }
 
-    .table-wrapper {
-      overflow-x: auto;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-    thead th {
-      background: var(--surface);
-      color: var(--muted);
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.9rem 1.2rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: background 0.12s;
-    }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.02); }
-    tbody td {
-      padding: 0.85rem 1.2rem;
-      vertical-align: middle;
-    }
-    .td-name { font-weight: 500; }
-    .td-id { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); }
-    .td-time { font-family: 'DM Mono', monospace; color: var(--accent2); }
-    .td-actions { display: flex; gap: 6px; }
+  /* PHOTO LIGHTBOX */
+  #lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300;
+    display: none; align-items: center; justify-content: center; flex-direction: column; gap: 1rem;
+    cursor: pointer;
+  }
+  #lightbox.show { display: flex; }
+  #lightboxImg {
+    max-width: 90vw; max-height: 80vh; border-radius: 12px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+    border: 1px solid var(--border);
+  }
+  #lightboxInfo { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); }
+  .lb-close {
+    position: absolute; top: 1.5rem; right: 1.5rem; background: var(--card);
+    border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer;
+  }
 
-    .avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent2), var(--accent));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #0a1a0a;
-      flex-shrink: 0;
-    }
-    .td-user { display: flex; align-items: center; gap: 10px; }
-
-    .empty-state {
-      text-align: center;
-      padding: 3rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-
-    /* ---- MODAL ---- */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .modal-overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .modal {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      width: 380px;
-      max-width: 90vw;
-      transform: scale(0.95);
-      transition: transform 0.2s;
-    }
-    .modal-overlay.show .modal { transform: scale(1); }
-    .modal h3 { font-size: 1rem; margin-bottom: 1rem; }
-    .modal-actions { display: flex; gap: 0.6rem; margin-top: 1.2rem; }
-
-    /* ---- RESPONSIVE ---- */
-    @media (max-width: 780px) {
-      .container { grid-template-columns: 1fr; }
-    }
-  </style>
+  @media (max-width: 780px) { .container { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 
 <header>
-  <div class="logo">
-    <div class="logo-dot"></div>
-    <span>AbsensiPro</span>
-  </div>
+  <div class="logo"><div class="logo-dot"></div><span>AbsensiPro</span></div>
   <div id="clock" class="header-clock">00:00:00</div>
   <div class="header-date" id="header-date">Senin, 1 Januari</div>
 </header>
@@ -365,8 +224,6 @@
 <div class="container">
   <!-- LEFT PANEL -->
   <div class="left-panel">
-
-    <!-- Form Absensi -->
     <div class="card">
       <div class="section-label">Catat Kehadiran</div>
       <div class="input-group">
@@ -377,40 +234,41 @@
         <label>Nama Lengkap</label>
         <input type="text" id="empName" placeholder="Nama karyawan" />
       </div>
-      <div class="btn-row" style="margin-top:0.5rem;">
-        <button class="btn btn-masuk" onclick="recordAbsensi()">
-          ✔ Masuk
-        </button>
-        <button class="btn btn-keluar" onclick="recordPulang()">
-          ✗ Pulang
-        </button>
+
+      <!-- Camera Box -->
+      <div class="camera-box" id="cameraBox">
+        <video id="videoEl" autoplay playsinline muted></video>
+        <div class="camera-overlay">
+          <div class="cam-timestamp" id="camTimestamp">—</div>
+          <div class="cam-indicator"><div class="cam-dot"></div> LIVE</div>
+        </div>
       </div>
+
+      <!-- Tombol normal -->
+      <div class="btn-row" id="btnNormal">
+        <button class="btn btn-masuk" onclick="startCamera('masuk')">📷 Masuk</button>
+        <button class="btn btn-keluar" onclick="startCamera('pulang')">📷 Pulang</button>
+      </div>
+
+      <!-- Tombol saat kamera aktif -->
+      <div class="btn-row" id="btnCamera" style="display:none;">
+        <button class="btn btn-capture" onclick="capturePhoto()">📸 Ambil Foto</button>
+        <button class="btn btn-cancel-cam" onclick="stopCamera()">✕ Batal</button>
+      </div>
+
+      <canvas id="snapCanvas" style="display:none;"></canvas>
     </div>
 
-    <!-- Statistik -->
     <div class="card">
       <div class="section-label">Statistik Hari Ini</div>
       <div class="stats-grid">
-        <div class="stat-card s-total">
-          <div class="stat-value" id="stat-total">0</div>
-          <div class="stat-label">Total Karyawan</div>
-        </div>
-        <div class="stat-card s-masuk">
-          <div class="stat-value" id="stat-masuk">0</div>
-          <div class="stat-label">Sudah Masuk</div>
-        </div>
-        <div class="stat-card s-pulang">
-          <div class="stat-value" id="stat-pulang">0</div>
-          <div class="stat-label">Sudah Pulang</div>
-        </div>
-        <div class="stat-card s-belum">
-          <div class="stat-value" id="stat-belum">0</div>
-          <div class="stat-label">Belum Pulang</div>
-        </div>
+        <div class="stat-card s-total"><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total Karyawan</div></div>
+        <div class="stat-card s-masuk"><div class="stat-value" id="stat-masuk">0</div><div class="stat-label">Sudah Masuk</div></div>
+        <div class="stat-card s-pulang"><div class="stat-value" id="stat-pulang">0</div><div class="stat-label">Sudah Pulang</div></div>
+        <div class="stat-card s-belum"><div class="stat-value" id="stat-belum">0</div><div class="stat-label">Belum Pulang</div></div>
       </div>
     </div>
 
-    <!-- Export -->
     <div class="card">
       <div class="section-label">Ekspor Data</div>
       <div class="btn-row">
@@ -418,7 +276,6 @@
         <button class="btn btn-sm btn-danger-sm" onclick="clearAll()">🗑 Hapus Semua</button>
       </div>
     </div>
-
   </div>
 
   <!-- RIGHT PANEL -->
@@ -435,6 +292,8 @@
           <tr>
             <th>#</th>
             <th>Karyawan</th>
+            <th>Foto Masuk</th>
+            <th>Foto Pulang</th>
             <th>Jam Masuk</th>
             <th>Jam Pulang</th>
             <th>Aksi</th>
@@ -462,32 +321,57 @@
   </div>
 </div>
 
-<!-- Toast -->
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()">
+  <div class="lb-close" onclick="closeLightbox()">✕</div>
+  <img id="lightboxImg" src="" alt="Foto Absensi" />
+  <div id="lightboxInfo"></div>
+</div>
+
 <div id="toast"></div>
 
 <script>
 let records = JSON.parse(localStorage.getItem('absensi') || '[]');
 let deleteTarget = null;
+let stream = null;
+let cameraMode = null; // 'masuk' | 'pulang'
 
 const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
+// ---- CLOCK ----
 function updateClock() {
   const now = new Date();
   const hh = String(now.getHours()).padStart(2,'0');
   const mm = String(now.getMinutes()).padStart(2,'0');
   const ss = String(now.getSeconds()).padStart(2,'0');
   document.getElementById('clock').textContent = `${hh}:${mm}:${ss}`;
-  document.getElementById('header-date').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('header-date').textContent =
+    `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  // live timestamp on camera overlay
+  const d = now;
+  const dateStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const timeStr = `${hh}:${mm}:${ss}`;
+  document.getElementById('camTimestamp').textContent = `${dateStr}  ${timeStr}`;
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-function getTime() {
+function getNow() {
   const n = new Date();
-  return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  const hh = String(n.getHours()).padStart(2,'0');
+  const mm = String(n.getMinutes()).padStart(2,'0');
+  const ss = String(n.getSeconds()).padStart(2,'0');
+  const dd = String(n.getDate()).padStart(2,'0');
+  const mo = String(n.getMonth()+1).padStart(2,'0');
+  return {
+    time: `${hh}:${mm}`,
+    full: `${dd}/${mo}/${n.getFullYear()} ${hh}:${mm}:${ss}`,
+    ts: Date.now()
+  };
 }
 
+// ---- TOAST ----
 function showToast(msg, type='success') {
   const t = document.getElementById('toast');
   t.textContent = (type==='success' ? '✅ ' : '⚠️ ') + msg;
@@ -495,56 +379,136 @@ function showToast(msg, type='success') {
   setTimeout(() => t.className = '', 2800);
 }
 
+// ---- STORAGE ----
 function save() {
   localStorage.setItem('absensi', JSON.stringify(records));
   renderTable();
   updateStats();
 }
 
-function recordAbsensi() {
+// ---- CAMERA ----
+async function startCamera(mode) {
   const id = document.getElementById('empId').value.trim();
   const name = document.getElementById('empName').value.trim();
   if (!id || !name) { showToast('Lengkapi ID dan nama karyawan', 'error'); return; }
-  if (records.find(r => r.id === id && !r.pulang)) {
+
+  if (mode === 'masuk' && records.find(r => r.id === id && !r.pulang)) {
     showToast('Karyawan ini sudah absen masuk', 'error'); return;
   }
-  records.unshift({ id, name, masuk: getTime(), pulang: null, ts: Date.now() });
-  clearForm();
-  save();
-  showToast(`${name} berhasil absen masuk`);
+  if (mode === 'pulang') {
+    const rec = records.find(r => r.id === id && !r.pulang);
+    if (!rec) { showToast('Data masuk tidak ditemukan', 'error'); return; }
+  }
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 }, audio: false });
+    document.getElementById('videoEl').srcObject = stream;
+    document.getElementById('cameraBox').classList.add('active');
+    document.getElementById('btnNormal').style.display = 'none';
+    document.getElementById('btnCamera').style.display = 'flex';
+    cameraMode = mode;
+  } catch(e) {
+    showToast('Kamera tidak dapat diakses', 'error');
+  }
 }
 
-function recordPulang() {
+function stopCamera() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  document.getElementById('cameraBox').classList.remove('active');
+  document.getElementById('btnNormal').style.display = 'flex';
+  document.getElementById('btnCamera').style.display = 'none';
+  cameraMode = null;
+}
+
+function capturePhoto() {
+  const video = document.getElementById('videoEl');
+  const canvas = document.getElementById('snapCanvas');
+  const W = video.videoWidth || 640;
+  const H = video.videoHeight || 480;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Draw video frame
+  ctx.drawImage(video, 0, 0, W, H);
+
+  // Burn timestamp onto photo
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mo = String(now.getMonth()+1).padStart(2,'0');
+  const yyyy = now.getFullYear();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  const stamp = `${dd}/${mo}/${yyyy}  ${hh}:${mm}:${ss}`;
+  const label = cameraMode === 'masuk' ? '● MASUK' : '● PULANG';
+
+  // Semi-transparent bar
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, H - 50, W, 50);
+
+  // Timestamp text
+  ctx.font = 'bold 14px "DM Mono", monospace';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(stamp, 14, H - 28);
+
+  // Label
+  ctx.font = 'bold 12px "Sora", sans-serif';
+  ctx.fillStyle = cameraMode === 'masuk' ? '#4ade80' : '#f87171';
+  ctx.fillText(label, 14, H - 10);
+
+  const photoData = canvas.toDataURL('image/jpeg', 0.85);
+
   const id = document.getElementById('empId').value.trim();
-  if (!id) { showToast('Masukkan ID karyawan', 'error'); return; }
-  const rec = records.find(r => r.id === id && !r.pulang);
-  if (!rec) { showToast('Data masuk tidak ditemukan', 'error'); return; }
-  rec.pulang = getTime();
+  const name = document.getElementById('empName').value.trim();
+  const nowInfo = getNow();
+
+  if (cameraMode === 'masuk') {
+    records.unshift({
+      id, name,
+      masuk: nowInfo.time, masukFull: nowInfo.full,
+      pulang: null, pulangFull: null,
+      fotoMasuk: photoData, fotoPulang: null,
+      ts: nowInfo.ts
+    });
+    showToast(`${name} berhasil absen masuk`);
+  } else {
+    const rec = records.find(r => r.id === id && !r.pulang);
+    if (rec) {
+      rec.pulang = nowInfo.time;
+      rec.pulangFull = nowInfo.full;
+      rec.fotoPulang = photoData;
+      showToast(`${name} berhasil absen pulang`);
+    }
+  }
+
   clearForm();
+  stopCamera();
   save();
-  showToast(`${rec.name} berhasil absen pulang`);
 }
 
 function clearForm() {
   ['empId','empName'].forEach(k => document.getElementById(k).value = '');
 }
 
+// ---- TABLE ----
 function getInitials(name) {
   return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
 
+function photoCell(dataUrl, label, name) {
+  if (!dataUrl) return `<div class="no-photo">📷</div>`;
+  return `<img class="photo-thumb" src="${dataUrl}" title="${label} — ${name}" onclick="openLightbox('${dataUrl.replace(/'/g,"\\'")}','${label} — ${name}')" />`;
+}
+
 function renderTable() {
   const q = document.getElementById('searchBox').value.toLowerCase();
-  let data = records.filter(r =>
+  const data = records.filter(r =>
     r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q)
   );
   const tbody = document.getElementById('tableBody');
   const empty = document.getElementById('emptyState');
-  if (!data.length) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
   tbody.innerHTML = data.map((r,i) => `
     <tr>
@@ -558,8 +522,17 @@ function renderTable() {
           </div>
         </div>
       </td>
-      <td class="td-time">${r.masuk}</td>
-      <td class="td-time">${r.pulang || '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${photoCell(r.fotoMasuk, 'Masuk', r.name)}</td>
+      <td>${r.fotoPulang ? photoCell(r.fotoPulang, 'Pulang', r.name) : '<div class="no-photo">📷</div>'}</td>
+      <td>
+        <div class="td-time">${r.masuk}</div>
+        <div style="font-size:0.68rem;color:var(--muted);font-family:'DM Mono',monospace;">${r.masukFull || ''}</div>
+      </td>
+      <td>
+        ${r.pulang
+          ? `<div class="td-time">${r.pulang}</div><div style="font-size:0.68rem;color:var(--muted);font-family:'DM Mono',monospace;">${r.pulangFull||''}</div>`
+          : `<span style="color:var(--muted)">—</span>`}
+      </td>
       <td>
         <div class="td-actions">
           <button class="btn-sm btn-danger-sm" onclick="confirmDelete(${r.ts})">Hapus</button>
@@ -580,38 +553,44 @@ function updateStats() {
   document.getElementById('stat-belum').textContent = belum;
 }
 
+// ---- LIGHTBOX ----
+function openLightbox(src, info) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxInfo').textContent = info;
+  document.getElementById('lightbox').classList.add('show');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+}
+
+// ---- DELETE ----
 function confirmDelete(ts) {
   deleteTarget = ts;
   document.getElementById('deleteModal').classList.add('show');
   document.getElementById('confirmDelete').onclick = () => {
     records = records.filter(r => r.ts !== deleteTarget);
-    save();
-    closeModal();
-    showToast('Data berhasil dihapus');
+    save(); closeModal(); showToast('Data berhasil dihapus');
   };
 }
-
 function closeModal() {
   document.getElementById('deleteModal').classList.remove('show');
   deleteTarget = null;
 }
-
 function clearAll() {
   if (!records.length) { showToast('Tidak ada data untuk dihapus', 'error'); return; }
-  deleteTarget = 'all';
   document.getElementById('deleteModal').classList.add('show');
   document.getElementById('confirmDelete').onclick = () => {
-    records = [];
-    save();
-    closeModal();
-    showToast('Semua data berhasil dihapus');
+    records = []; save(); closeModal(); showToast('Semua data berhasil dihapus');
   };
 }
 
+// ---- EXPORT CSV ----
 function exportCSV() {
   if (!records.length) { showToast('Tidak ada data untuk diekspor', 'error'); return; }
-  const header = 'ID,Nama,Jam Masuk,Jam Pulang';
-  const rows = records.map(r => `${r.id},"${r.name}",${r.masuk},${r.pulang||''}`);
+  const header = 'ID,Nama,Jam Masuk,Waktu Masuk Lengkap,Jam Pulang,Waktu Pulang Lengkap,Foto Masuk (base64),Foto Pulang (base64)';
+  const rows = records.map(r =>
+    `${r.id},"${r.name}",${r.masuk},"${r.masukFull||''}",${r.pulang||''},"${r.pulangFull||''}","${r.fotoMasuk||''}","${r.fotoPulang||''}"`
+  );
   const csv = [header, ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a');
