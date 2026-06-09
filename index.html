@@ -5,7 +5,7 @@
    if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');
     }
-</script>>
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Absensi Digital</title>
@@ -119,7 +119,7 @@
       color: var(--muted);
       font-weight: 500;
     }
-    .input-group input, .input-group select {
+    .input-group input {
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
@@ -131,11 +131,8 @@
       transition: border-color 0.2s;
       width: 100%;
     }
-    .input-group input:focus, .input-group select:focus {
+    .input-group input:focus {
       border-color: var(--accent2);
-    }
-    .input-group select option {
-      background: var(--surface);
     }
 
     /* ---- BUTTONS ---- */
@@ -186,27 +183,6 @@
     }
     .btn-danger-sm:hover { background: rgba(248,113,113,0.1); }
 
-    /* ---- STATUS BADGE ---- */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 99px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-    }
-    .badge-hadir { background: rgba(74,222,128,0.12); color: var(--accent); }
-    .badge-terlambat { background: rgba(245,158,11,0.12); color: var(--accent3); }
-    .badge-izin { background: rgba(56,189,248,0.12); color: var(--accent2); }
-    .badge-alpha { background: rgba(248,113,113,0.12); color: var(--danger); }
-    .badge-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-
     /* ---- STATS GRID ---- */
     .stats-grid {
       display: grid;
@@ -227,10 +203,10 @@
       margin-bottom: 4px;
     }
     .stat-label { font-size: 0.7rem; color: var(--muted); }
-    .s-hadir .stat-value { color: var(--accent); }
-    .s-terlambat .stat-value { color: var(--accent3); }
-    .s-izin .stat-value { color: var(--accent2); }
-    .s-alpha .stat-value { color: var(--danger); }
+    .s-masuk .stat-value { color: var(--accent); }
+    .s-pulang .stat-value { color: var(--accent2); }
+    .s-belum .stat-value { color: var(--accent3); }
+    .s-total .stat-value { color: var(--text); }
 
     /* ---- TOAST ---- */
     #toast {
@@ -278,28 +254,6 @@
     }
     .search-box:focus { border-color: var(--accent2); }
     .search-box::placeholder { color: var(--muted); }
-
-    .filter-bar {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .filter-btn {
-      padding: 0.35rem 0.8rem;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-family: 'Sora', sans-serif;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .filter-btn.active {
-      border-color: var(--accent2);
-      color: var(--accent2);
-      background: rgba(56,189,248,0.08);
-    }
 
     .table-wrapper {
       overflow-x: auto;
@@ -423,27 +377,6 @@
         <label>Nama Lengkap</label>
         <input type="text" id="empName" placeholder="Nama karyawan" />
       </div>
-      <div class="input-group">
-        <label>Departemen</label>
-        <select id="empDept">
-          <option value="">Pilih Divisi</option>
-          <option>Quality control</option>
-          <option>Sumber Daya Manusia</option>
-          <option>Keuangan & Akuntansi</option>
-          <option>Pemasaran</option>
-          <option>Operasional</option>
-          <option>Hukum & Kepatuhan</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>Status Kehadiran</label>
-        <select id="empStatus">
-          <option value="hadir">Hadir</option>
-          <option value="terlambat">Terlambat</option>
-          <option value="izin">Izin / Cuti</option>
-          <option value="alpha">Alpha</option>
-        </select>
-      </div>
       <div class="btn-row" style="margin-top:0.5rem;">
         <button class="btn btn-masuk" onclick="recordAbsensi()">
           ✔ Masuk
@@ -458,21 +391,21 @@
     <div class="card">
       <div class="section-label">Statistik Hari Ini</div>
       <div class="stats-grid">
-        <div class="stat-card s-hadir">
-          <div class="stat-value" id="stat-hadir">0</div>
-          <div class="stat-label">Hadir</div>
+        <div class="stat-card s-total">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Karyawan</div>
         </div>
-        <div class="stat-card s-terlambat">
-          <div class="stat-value" id="stat-terlambat">0</div>
-          <div class="stat-label">Terlambat</div>
+        <div class="stat-card s-masuk">
+          <div class="stat-value" id="stat-masuk">0</div>
+          <div class="stat-label">Sudah Masuk</div>
         </div>
-        <div class="stat-card s-izin">
-          <div class="stat-value" id="stat-izin">0</div>
-          <div class="stat-label">Izin / Cuti</div>
+        <div class="stat-card s-pulang">
+          <div class="stat-value" id="stat-pulang">0</div>
+          <div class="stat-label">Sudah Pulang</div>
         </div>
-        <div class="stat-card s-alpha">
-          <div class="stat-value" id="stat-alpha">0</div>
-          <div class="stat-label">Alpha</div>
+        <div class="stat-card s-belum">
+          <div class="stat-value" id="stat-belum">0</div>
+          <div class="stat-label">Belum Pulang</div>
         </div>
       </div>
     </div>
@@ -495,13 +428,6 @@
         <span class="table-title">Daftar Kehadiran</span>
         <input class="search-box" id="searchBox" placeholder="Cari nama atau ID…" oninput="renderTable()" />
       </div>
-      <div class="filter-bar" style="margin-top:1rem;">
-        <button class="filter-btn active" onclick="setFilter('semua',this)">Semua</button>
-        <button class="filter-btn" onclick="setFilter('hadir',this)">Hadir</button>
-        <button class="filter-btn" onclick="setFilter('terlambat',this)">Terlambat</button>
-        <button class="filter-btn" onclick="setFilter('izin',this)">Izin</button>
-        <button class="filter-btn" onclick="setFilter('alpha',this)">Alpha</button>
-      </div>
     </div>
     <div class="table-wrapper">
       <table>
@@ -509,8 +435,6 @@
           <tr>
             <th>#</th>
             <th>Karyawan</th>
-            <th>Divisi</th>
-            <th>Status</th>
             <th>Jam Masuk</th>
             <th>Jam Pulang</th>
             <th>Aksi</th>
@@ -543,7 +467,6 @@
 
 <script>
 let records = JSON.parse(localStorage.getItem('absensi') || '[]');
-let currentFilter = 'semua';
 let deleteTarget = null;
 
 const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -581,13 +504,11 @@ function save() {
 function recordAbsensi() {
   const id = document.getElementById('empId').value.trim();
   const name = document.getElementById('empName').value.trim();
-  const dept = document.getElementById('empDept').value;
-  const status = document.getElementById('empStatus').value;
-  if (!id || !name || !dept) { showToast('Lengkapi semua data terlebih dahulu', 'error'); return; }
+  if (!id || !name) { showToast('Lengkapi ID dan nama karyawan', 'error'); return; }
   if (records.find(r => r.id === id && !r.pulang)) {
     showToast('Karyawan ini sudah absen masuk', 'error'); return;
   }
-  records.unshift({ id, name, dept, status, masuk: getTime(), pulang: null, ts: Date.now() });
+  records.unshift({ id, name, masuk: getTime(), pulang: null, ts: Date.now() });
   clearForm();
   save();
   showToast(`${name} berhasil absen masuk`);
@@ -606,39 +527,17 @@ function recordPulang() {
 
 function clearForm() {
   ['empId','empName'].forEach(k => document.getElementById(k).value = '');
-  document.getElementById('empDept').value = '';
-  document.getElementById('empStatus').value = 'hadir';
-}
-
-function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable();
 }
 
 function getInitials(name) {
   return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
 
-function badgeHtml(status) {
-  const map = {
-    hadir: ['badge-hadir','Hadir'],
-    terlambat: ['badge-terlambat','Terlambat'],
-    izin: ['badge-izin','Izin / Cuti'],
-    alpha: ['badge-alpha','Alpha'],
-  };
-  const [cls, label] = map[status] || ['',''];
-  return `<span class="status-badge ${cls}"><span class="badge-dot"></span>${label}</span>`;
-}
-
 function renderTable() {
   const q = document.getElementById('searchBox').value.toLowerCase();
-  let data = records.filter(r => {
-    const matchFilter = currentFilter === 'semua' || r.status === currentFilter;
-    const matchSearch = r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q);
-    return matchFilter && matchSearch;
-  });
+  let data = records.filter(r =>
+    r.name.toLowerCase().includes(q) || r.id.toLowerCase().includes(q)
+  );
   const tbody = document.getElementById('tableBody');
   const empty = document.getElementById('emptyState');
   if (!data.length) {
@@ -659,8 +558,6 @@ function renderTable() {
           </div>
         </div>
       </td>
-      <td style="color:var(--muted);font-size:0.8rem;">${r.dept}</td>
-      <td>${badgeHtml(r.status)}</td>
       <td class="td-time">${r.masuk}</td>
       <td class="td-time">${r.pulang || '<span style="color:var(--muted)">—</span>'}</td>
       <td>
@@ -673,11 +570,14 @@ function renderTable() {
 }
 
 function updateStats() {
-  const count = s => records.filter(r => r.status === s).length;
-  document.getElementById('stat-hadir').textContent = count('hadir');
-  document.getElementById('stat-terlambat').textContent = count('terlambat');
-  document.getElementById('stat-izin').textContent = count('izin');
-  document.getElementById('stat-alpha').textContent = count('alpha');
+  const total = records.length;
+  const masuk = records.filter(r => r.masuk).length;
+  const pulang = records.filter(r => r.pulang).length;
+  const belum = masuk - pulang;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-masuk').textContent = masuk;
+  document.getElementById('stat-pulang').textContent = pulang;
+  document.getElementById('stat-belum').textContent = belum;
 }
 
 function confirmDelete(ts) {
@@ -710,8 +610,8 @@ function clearAll() {
 
 function exportCSV() {
   if (!records.length) { showToast('Tidak ada data untuk diekspor', 'error'); return; }
-  const header = 'ID,Nama,Departemen,Status,Jam Masuk,Jam Pulang';
-  const rows = records.map(r => `${r.id},"${r.name}","${r.dept}",${r.status},${r.masuk},${r.pulang||''}`);
+  const header = 'ID,Nama,Jam Masuk,Jam Pulang';
+  const rows = records.map(r => `${r.id},"${r.name}",${r.masuk},${r.pulang||''}`);
   const csv = [header, ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a');
@@ -721,12 +621,10 @@ function exportCSV() {
   showToast('Data berhasil diekspor');
 }
 
-// Click outside modal to close
 document.getElementById('deleteModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
-// Init
 renderTable();
 updateStats();
 </script>
